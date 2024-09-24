@@ -10,10 +10,8 @@ import { API_NAMESPACE, IpcLoggerApi, IpcLogData } from '../shared';
     return;
   }
 
-  const API_READY_DELAY = 0;
-
   const startTime = Date.now();
-  const logData: IpcLogData[] = [
+  const mockData: Omit<IpcLogData, 'n'>[] = [
     { t: startTime + 10, channel: 'channel1', method: 'on', args: [] },
     { t: startTime + 12, channel: 'channel1', method: 'on', args: [] },
     {
@@ -39,14 +37,53 @@ import { API_NAMESPACE, IpcLoggerApi, IpcLogData } from '../shared';
         },
       ],
     },
-  ].map((ev, i) => ({ n: i + 1, ...ev }));
+    {
+      t: startTime + 1200,
+      channel: 'data-types',
+      method: 'on',
+      args: [
+        {
+          int: 123,
+          float: 123.456,
+          str: 'String',
+          null: null,
+          undefined: undefined,
+          sumFn: (a: number, b: number) => a + b,
+          obj: { a: 1, s: 'str' },
+          arr: [
+            1,
+            2,
+            3.456,
+            'str',
+            ['x', 'y'],
+            { foo: 1, bar: 2 },
+            null,
+            undefined,
+          ],
+        },
+      ],
+    },
+    {
+      t: startTime + 2500,
+      channel: 'multiple-args',
+      method: 'handleOnce',
+      args: [
+        123,
+        {
+          obj: 'a',
+          inner: { b: 'str' },
+        },
+        'string',
+        ['array', 'foo', 'bar'],
+      ],
+    },
+  ];
+  const logData = mockData.map((ev, i) => ({ n: i + 1, ...ev }));
 
-  setTimeout(() => {
-    const api: IpcLoggerApi = {
-      startTime,
-      ipcRenderer: {} as IpcRenderer,
-      onUpdate: (cb) => cb(logData),
-    };
-    (window as any)[API_NAMESPACE] = api;
-  }, API_READY_DELAY);
+  const api: IpcLoggerApi = {
+    startTime,
+    ipcRenderer: {} as IpcRenderer,
+    onUpdate: (cb) => cb(logData),
+  };
+  (window as any)[API_NAMESPACE] = api;
 })();

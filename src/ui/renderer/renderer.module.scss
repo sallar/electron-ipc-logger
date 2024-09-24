@@ -1,3 +1,87 @@
+$draggableWidth: 4px;
+
 .root {
-  display: block;
+  display: grid;
+  height: 100vh;
+
+  --top-bar-height: 27px;
+  --data-panel-width: 300px;
+  --data-panel-height: 200px;
+}
+
+.right {
+  grid-template-rows: var(--top-bar-height) 1fr;
+  /* the width of the data panel is adjusted in JS */
+  grid-template-columns: 1fr var(--data-panel-width);
+  grid-template-areas:
+    'header header'
+    'main panel';
+
+  &.closed {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'header'
+      'main';
+  }
+}
+
+.bottom {
+  /* the height of the data panel is adjusted in JS */
+  grid-template-rows: var(--top-bar-height) 1fr var(--data-panel-height);
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    'header'
+    'main'
+    'panel';
+
+  &.closed {
+    grid-template-areas:
+      'header'
+      'main';
+  }
+}
+
+.draggable {
+  grid-area: draggable;
+  position: fixed;
+}
+
+.right .draggable {
+  cursor: ew-resize;
+  width: $draggableWidth;
+  height: 100%;
+  top: 0;
+  right: calc(var(--data-panel-width) - $draggableWidth / 2);
+}
+
+.bottom .draggable {
+  cursor: ns-resize;
+  width: 100%;
+  height: $draggableWidth;
+  left: 0;
+  bottom: calc(var(--data-panel-height) - $draggableWidth / 2);
+}
+
+.topBar {
+  grid-area: header;
+}
+
+.main {
+  grid-area: main;
+  overflow-y: auto;
+}
+
+.panel {
+  grid-area: panel;
+  overflow-y: auto;
+}
+.right .panel {
+  border-left: 1px solid #d3e3fd;
+}
+.bottom .panel {
+  border-top: 1px solid #d3e3fd;
+}
+
+.panelClosed .panel {
+  display: none;
 }

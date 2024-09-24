@@ -1,0 +1,98 @@
+@use '../style.scss' as ui;
+
+.root {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  cursor: default;
+
+  thead {
+    th {
+      position: sticky;
+      top: 0;
+      // background needs to be applied to <th> instead of top because of sticky
+      background: #f3f6fc;
+      font-family: ui.$fontUi;
+      user-select: none;
+      text-align: left;
+      border-right: 1px solid #d3e3fd;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      & > div {
+        display: flex;
+        justify-content: space-between;
+        // border-bottom and pading applied to container instead of <th> nor
+        // <thead> due to sticky property
+        border-bottom: 1px solid #d3e3fd;
+        padding: 7px;
+      }
+    }
+  }
+
+  tbody {
+    border-bottom: 1px solid #f8fafd;
+
+    * {
+      font-family: ui.$fontCode;
+    }
+
+    tr:not(.active) {
+      background: #ffffff;
+
+      &.odd {
+        background: #f8fafd;
+      }
+
+      &:hover {
+        background: #f2f2f2;
+      }
+    }
+
+    tr.active {
+      background: #d3e3fd;
+    }
+
+    td {
+      padding: 4px 7px;
+      border-right: 1px solid #d3e3fd;
+      white-space: nowrap;
+      overflow: hidden;
+
+      &:last-child {
+        border-right: none;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.sortArrow {
+  color: #474747;
+}
+
+.colN {
+  width: 3em;
+}
+
+.colT {
+  width: 8em;
+}
+
+.colMethod {
+  width: 7em;
+}
+
+.colChannel {
+  width: 10em;
+}
+
+.colArgs {
+  width: auto;
+}

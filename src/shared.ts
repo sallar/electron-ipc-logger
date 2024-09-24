@@ -75,15 +75,13 @@ export type IpcLogData = {
   /** Sequential unique ID of the event */
   n: number;
   /** Method used to send the message (send/invoke/...) */
-  method: string;
+  method: 'handle' | 'handleOnce' | 'on' | 'once' | 'send';
   /** Name of the channel where the event was sent */
   channel: string;
   /** Arguments for the event (no arguments = empty array) */
   args: any[];
   /** On invoke methods, the result if any */
   result?: any;
-  senderId?: number;
-  frameId?: number;
 };
 
 export type IpcLoggerApi = Readonly<{

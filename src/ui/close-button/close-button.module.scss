@@ -1,0 +1,15 @@
+.closeButton {
+  width: 10px;
+  height: 10px;
+  padding: 7px;
+
+  svg {
+    stroke: #474747;
+    stroke-width: 1.5px;
+  }
+
+  &:hover {
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+}

@@ -1,0 +1,60 @@
+.root {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+
+.checkbox {
+  position: relative;
+  outline: none;
+  width: 12px;
+  height: 12px;
+
+  .box {
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    border: 1px solid #767676;
+    border-radius: 2px;
+    background: #ffffff;
+    width: 100%;
+    height: 100%;
+  }
+
+  .svg {
+    stroke: #ffffff;
+    opacity: 0;
+  }
+
+  &.checked {
+    .box {
+      border: none;
+      background-color: #1b6ef3;
+    }
+
+    .svg {
+      z-index: 1;
+      opacity: 100;
+    }
+  }
+}
+
+.circle {
+  display: none;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 50%;
+  height: 22px;
+  width: 22px;
+  position: absolute;
+  top: calc(50% - 11px);
+  left: calc(50% - 11px);
+
+  &.hover {
+    display: block;
+  }
+}
+
+.label {
+  padding-left: 6px;
+}

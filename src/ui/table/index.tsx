@@ -1,25 +1,87 @@
-import { FC } from 'react';
-import { IpcRow } from './row';
+import { clsx } from 'clsx';
+import { FC, cloneElement } from 'react';
+
 import { IpcLogData } from '../../shared';
+import { SortableField } from '../types';
+import { useIpcTable } from './hooks';
+import { IpcRow } from './row';
+
+import styles from './table.module.scss';
 
 export type Props = {
   data: ReadonlyArray<IpcLogData>;
+  selectedMsg: IpcLogData | undefined;
+  sortBy: SortableField;
+  sortReverse: boolean;
+  filter: string;
+  filterInverted: boolean;
+  relativeTimes: boolean;
+  className?: string;
+  onRowClick: (n: IpcLogData['n']) => void;
+  setSortBy: (field: SortableField) => void;
 };
 
-export const IpcTable: FC<Props> = ({ data }) => {
+/**
+ * Table showing the list of captured messages
+ */
+export const IpcTable: FC<Props> = ({ className, ...props }) => {
+  const {
+    rows,
+    selectedMsg,
+    relativeTimes,
+    sortBy,
+    sortReverse,
+    onRowClick,
+    sortByN,
+    sortByTime,
+    sortByMethod,
+    sortByChannel,
+  } = useIpcTable(props);
+
+  const sortArrow = (
+    <div className={styles.sortArrow}>{sortReverse ? '▼' : '▲'}</div>
+  );
+
   return (
-    <table>
-      <thead>
+    <table className={clsx(styles.root, className)}>
+      <thead className={className}>
         <tr>
-          <th>N</th>
-          <th>Time</th>
-          <th>Channel</th>
-          <th>Data</th>
+          <th onClick={sortByN} className={clsx(styles.colN)}>
+            <div>N{sortBy === 'n' && sortArrow}</div>
+          </th>
+          <th onClick={sortByTime} className={clsx(styles.colT)}>
+            <div>
+              Time
+              {sortBy === 't' && sortArrow}
+            </div>
+          </th>
+          <th onClick={sortByMethod} className={clsx(styles.colMethod)}>
+            <div>
+              Method
+              {sortBy === 'method' && sortArrow}
+            </div>
+          </th>
+          <th onClick={sortByChannel} className={clsx(styles.colChannel)}>
+            <div>
+              Channel
+              {sortBy === 'channel' && sortArrow}
+            </div>
+          </th>
+          <th className={styles.colArgs}>
+            <div>Data</div>
+          </th>
         </tr>
       </thead>
       <tbody>
-        {data.map((row, i) => (
-          <IpcRow key={i} data={row} />
+        {rows.map((row, i) => (
+          <IpcRow
+            key={row.n}
+            odd={i % 2 !== 0}
+            data={row}
+            active={selectedMsg === row}
+            relativeTimes={relativeTimes}
+            onClick={onRowClick}
+          />
         ))}
       </tbody>
     </table>

@@ -1,0 +1,53 @@
+.root {
+  display: flex;
+  align-items: center;
+}
+
+.inputWrapper {
+  box-sizing: border-box;
+  background: #edf2fa;
+  border: 2px solid #edf2fa;
+  border-radius: 11px;
+  padding: 3px 2px 2px 7px;
+  height: 21px;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background: #e1e6ed;
+  }
+
+  &.focused {
+    border: 2px solid #0b57d0;
+  }
+}
+
+.input {
+  background: transparent;
+  border: 0;
+  outline: none;
+  margin: 0 2px;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+
+  svg {
+    stroke: #474747;
+    stroke-width: 1.5;
+    fill: none;
+  }
+
+  & svg.fill {
+    fill: #474747;
+  }
+}
+
+.invisible {
+  opacity: 0;
+}
+
+.invertCb {
+  margin-left: 8px;
+}

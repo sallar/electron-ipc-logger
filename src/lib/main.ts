@@ -35,16 +35,6 @@ type LogEventFn = {
 let isInstalled = false;
 let nEventsLogged = 0;
 
-const originalMethods = {
-  handle: ipcMain.handle,
-  handleOnce: ipcMain.handleOnce,
-  on: ipcMain.on,
-  once: ipcMain.once,
-  removeAllListeners: ipcMain.removeAllListeners,
-  removeHandler: ipcMain.removeHandler,
-  removeListener: ipcMain.removeListener,
-};
-
 /*
  * This map is needed to know which listener to remove when calling `remove*`,
  * since the original listener is wrapped with the logging function.
@@ -296,14 +286,6 @@ function getLogger(
 
     if (filter && !filter(data)) return;
 
-    // data augmentation
-    if (event?.sender?.id) {
-      data.senderId = event.sender.id;
-    }
-    if (event?.frameId) {
-      data.frameId = event.frameId;
-    }
-
     // custom callback inside main
     onIpcMessage && onIpcMessage(data.channel, ...data.args);
 
@@ -329,11 +311,5 @@ function getLogger(
  *
  */
 function logInConsole(data: IpcLogData): void {
-  const senderId = data.senderId ?? 'unknown';
-  const frameId = data.frameId ?? 'unknown';
-
-  console.log(
-    `[IPC](${data.method}) ${senderId} -> ${frameId} ${data.channel}`,
-    ...data.args
-  );
+  console.log(`[IPC](${data.method}) -> ${data.channel}`, ...data.args);
 }

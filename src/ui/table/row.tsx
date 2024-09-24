@@ -1,17 +1,55 @@
-import { FC } from 'react';
+import { clsx } from 'clsx';
+import { FC, MouseEvent, useCallback } from 'react';
 import { IpcLogData } from '../../shared';
+import { Time } from '../time';
+import { TrafficArrow } from '../traffic-arrow';
+
+import styles from './table.module.scss';
 
 export type Props = {
   data: IpcLogData;
+  odd: boolean;
+  relativeTimes: boolean;
+  active: boolean;
+  onClick: (n: IpcLogData['n']) => void;
 };
 
-export const IpcRow: FC<Props> = ({ data }) => {
+export const IpcRow: FC<Props> = ({
+  data,
+  odd,
+  relativeTimes,
+  active,
+  onClick,
+}) => {
+  const clickHandler = useCallback(
+    (ev: MouseEvent) => {
+      let elem = ev.target as HTMLElement;
+      while (elem.dataset.n === undefined && elem.parentElement) {
+        elem = elem.parentElement;
+      }
+      if (elem.dataset) {
+        onClick(Number(elem.dataset.n));
+      }
+    },
+    [onClick]
+  );
+
   return (
-    <tr>
-      <td>{data.n}</td>
-      <td>{data.t}</td>
-      <td>{data.channel}</td>
-      <td>{JSON.stringify(data.args)}</td>
+    <tr
+      data-n={data.n}
+      onClick={clickHandler}
+      className={clsx(odd && styles.odd, active && styles.active)}
+    >
+      <td className={styles.colN}>{data.n}</td>
+      <td className={styles.colT}>
+        <Time t={data.t} relative={relativeTimes} />
+      </td>
+      <td className={styles.colMethod}>
+        <TrafficArrow msg={data} />
+        {data.method}
+      </td>
+      <td className={styles.colChannel}>{data.channel}</td>
+      <td className={styles.colArgs}>{JSON.stringify(data.args)}</td>
     </tr>
   );
 };

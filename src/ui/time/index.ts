@@ -14,15 +14,20 @@ export const Time: FC<Props> = ({ t, relative }) => {
 
 function relativeTime(ellapsedMs: number): string {
   // less than 1 sec
-  if (ellapsedMs < 1000) return `+${ellapsedMs} ms`;
+  if (ellapsedMs < 1000) return `+${ellapsedMs}ms`;
   // less than 1 min
-  if (ellapsedMs < 60_000) return `+${padSeconds(ellapsedMs / 1000)} s`;
+  if (ellapsedMs < 60_000) return `+${padSeconds(ellapsedMs / 1000)}s`;
   // less than 1 hour
   if (ellapsedMs < 3_600_000) {
-    const secs = (ellapsedMs % 60_000) / 1000;
     const mins = Math.floor(ellapsedMs / 60_000);
-    return `+${mins}:${padSeconds(secs, true)} s`;
+    const secs = (ellapsedMs - mins * 60_000) / 1000;
+    return `+${mins}m ${padSeconds(secs)}s`;
   }
+  // more than 1 hour
+  const hours = Math.floor(ellapsedMs / 3_600_000);
+  const mins = Math.floor((ellapsedMs - hours * 3_600_000) / 60_000);
+  const secs = (ellapsedMs - hours * 3_600_000 - mins * 60_000) / 1000;
+  return `+${hours}h ${mins}m ${padSeconds(secs)}s`;
 }
 
 function absoluteTime(timestamp: number): string {

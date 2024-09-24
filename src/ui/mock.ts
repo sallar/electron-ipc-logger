@@ -77,6 +77,8 @@ import { API_NAMESPACE, IpcLoggerApi, IpcLogData } from '../shared';
         ['array', 'foo', 'bar'],
       ],
     },
+    { t: startTime + 100_000, channel: '> 1 min', method: 'on', args: [] },
+    { t: startTime + 4_000_000, channel: '> 1 h', method: 'on', args: [] },
   ];
   const logData = mockData.map((ev, i) => ({ n: i + 1, ...ev }));
 

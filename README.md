@@ -2,9 +2,140 @@
 
 Log and display all user-defined IPC traffic in an electron app.
 
+![v1.0.0-rc1](./screenshots/v1.0.0-rc1.png)
+
+## Configuring it
+
+```
+npm install --save-dev electron-ipc-logger
+```
+
+Then, in your main process code just add the following once your app is ready:
+
+```ts
+import { installIpcLogger } from 'electron-ipc-logger';
+
+app.whenReady().then(async () => {
+  // ...
+  await installIpcLogger();
+  // ...
+});
+```
+
+## Options
+
+Complete list of options accepted by `installIpcLogger`:
+
+| Option              | Type                                        | Default     | Notes                                                                                                                                                                                                |
+| ------------------- | ------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `parent`            | `BrowserWindow`                             | `undefined` | When provided, the IPC Logger UI Window will be closed when the parent is closed                                                                                                                     |
+| `openUiOnStart`     | `boolean`                                   | `true`      | When `true` the UI window will show as soon as it's ready. If set to `false`, it can be opened at the convenient time by calling `openIpcLoggerWindow`                                               |
+| `disable`           | `boolean`                                   | `false`     | Allows to quickly enable or disable logging without overriding other options.                                                                                                                        |
+| `mainToRenderer`    | `boolean`                                   | `true`      | Log messages sent from the main process to the renderer process.                                                                                                                                     |
+| `rendererToMain`    | `boolean`                                   | `true`      | Log messages sent from the renderer process to the main process.                                                                                                                                     |
+| `consoleOutput`     | `boolean`                                   | `false`     | Output the intercepted messages to the console (from the main process).                                                                                                                              |
+| `logSystemMessages` | `boolean`                                   | `false`     | `true` to include system messages in the log, `false` to exclude them. (Messages prefixed with `ELECTRON` or `CHROME`)                                                                               |
+| `filter`            | `(data: IpcLogData) => boolean`             | `undefined` | Allows specifying what IPC messages should be logged or not. Note that unless `logSystemMessages` is set to `true`, the `filter` won't receive data from IPC channels considered as system messages. |
+| `onIpcMessage`      | `(channel: string, ...data: any[]) => void` | `undefined` | Callback to handle the intercepted messages with custom code (i.e. log it to a file, etc.)                                                                                                           |
+
+## F.A.Q
+
+### The IPC Logger UI shows even on production build!
+
+Yes, you are not supposed to _install_ it when building it for production. There are two ways to disable it:
+
+① Manage it manually:
+
+```ts
+if (!IS_PRODUCTION) {
+  await installIpcLogger();
+}
+```
+
+② Using the `disable` option for a cleaner code
+
+```ts
+await installIpcLogger({ disable: IS_PRODUCTION });
+```
+
+### The IPC Logger UI Window stays open when the app closes
+
+Providing a `parent` (i.e. your app main window) enables automatically closing the IPC Logger UI window when your app closes.
+
+```ts
+import { installIpcLogger } from 'electron-ipc-logger';
+
+app.whenReady().then(async () => {
+  // ...
+  await installIpcLogger({ parent: mainWindow });
+  // ...
+});
+```
+
+If your main window is created later (for any reason) and it's not available when installing this module, worry not! You can always provide the parent once your window is available:
+
+```ts
+import {
+  installIpcLogger,
+  setIpcLoggerParentWindow,
+} from 'electron-ipc-logger';
+
+app.whenReady().then(async () => {
+  // no parent available yet...
+  await installIpcLogger();
+});
+
+// once it's ready
+const mainWindow = createMainWindow();
+setIpcLoggerParentWindow(mainWindow);
+```
+
+### The IPC Logger UI Window is always shown at the start
+
+Yes, that's how it's set to work by default as the premise is that in development mode (every time the extension is installed), it would be desired to debug IPC messages.
+
+You can however, set it to be hidden by default and open/close it on a better timing (i.e. with some custom button or [app menu](https://www.electronjs.org/docs/latest/api/menu)):
+
+```ts
+import { installIpcLogger, openIpcLoggerWindow } from 'electron-ipc-logger';
+
+app.whenReady().then(async () => {
+  // no parent available yet...
+  await installIpcLogger({ openUiOnStart: false });
+});
+
+// To open the UI, you can call this function from an IPC listener or a menu in your app (note that IPC channels need to be handled manually):
+ipcMain.handle('YOUR_OPEN_UI_LOGGER_IPC_CHANNEL', () => openIpcLoggerWindow());
+```
+
+### How to permantently filter IPC communication?
+
+a.k.a. _I'm using a 3rd party module that uses IPC messages internally, and I don't care about them!_
+
+While it's always possible to filter and search messages in the UI Window, doing that every time might be tiring (specially if there's a lot of _noise_)
+
+Using the `filter` option allows ignoring messages to drop from the log:
+
+```ts
+import { installIpcLogger } from 'electron-ipc-logger';
+
+app.whenReady().then(async () => {
+  // i.e. let's say we want to ignore messages from i18n-next loading resources,
+  // which use the `Readfile-Request` and `Readfile-Response` channels:
+  await installIpcLogger({
+    filter: ({ channel }) =>
+      ![`Readfile-Request`, `Readfile-Response`].includes(channel),
+  });
+});
+```
+
+### Why is this not integrated on dev-tools?
+
+That was actually the initial approach for this module: Providing an extra `IPC` panel in the dev-tools window (the same way [React Developer Tools](https://chromewebstore.google.com/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi) works)... but the communication between the main process / dev tools window / IPC... was getting too complicated, so I opted to provide a UI Window that works for now, and maybe [continue the dev-tools approach](https://github.com/danikaze/electron-ipc-logger/tree/chrome-extension) at some point in the future.
+
 ## How does internally works?
 
-A.K.A. Helping myself to remember the underlying architecture.
+A.K.A. Helping myself to remember the underlying architecture (or explaining the insides to collaborators).
 
 First thing required is to call `installIpcLogger()` from the **main** process.
 

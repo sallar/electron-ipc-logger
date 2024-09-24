@@ -47,20 +47,13 @@ export type IpcLoggerOptions = {
    */
   logSystemMessages?: boolean;
   /**
-   * To display the logged renderers, this library installs a chrome extension
-   * to provide an extra panel in the devTools.
-   * Usually, the location will be automatically resolved but can be overriden
-   * if having any problem due to a different build configuration with this
-   */
-  extensionPath?: string;
-  /**
    * IPC channel to apply the filter to.
    * This is a more advanced alternative to `logSystemMessages`.
    * Note that unless `logSystemMessages` is set to `true`, the `filter` won't
    * receive data from IPC channels considered as system messages.
    *
-   * @param channel
-   * @returns `true` to log the message, `false` to ignore it.
+   * @param data Data from the received message
+   * @returns `true` to log the message, `false` to drop it.
    */
   filter?: (data: IpcLogData) => boolean;
   /**
@@ -105,7 +98,7 @@ export const DEFAULT_OPTIONS: IpcLoggerOptions = {
   disable: false,
   mainToRenderer: true,
   rendererToMain: true,
-  consoleOutput: true,
+  consoleOutput: false,
   logSystemMessages: false,
 };
 

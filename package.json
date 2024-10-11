@@ -1,6 +1,6 @@
 {
   "name": "electron-ipc-logger",
-  "version": "1.0.0-rc1",
+  "version": "1.0.0-rc2",
   "description": "Log and display all user-defined IPC traffic in an electron app.",
   "scripts": {
     "build": "npm run clear && npm run build:ui && npm run build:tsc",

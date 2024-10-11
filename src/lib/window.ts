@@ -1,10 +1,11 @@
-import { BrowserWindow, Event } from 'electron';
+import { app, BrowserWindow, Event } from 'electron';
 import { getAbsolutePath } from './utils/get-absolute-path';
+import { IpcLoggerOptions } from '../shared';
 
 let win: BrowserWindow | undefined;
 let parentWin: BrowserWindow | undefined;
-let parentOnCloseHandler: ((event: Event) => void) | undefined;
-let allowClosing = true;
+/** Only closes "for real" when exiting the app. Meanwhile it just hides */
+let closeForReal = false;
 
 /**
  * Opens the IpcLogger UI window.
@@ -57,20 +58,18 @@ export function setIpcLoggerParentWindow(parent?: BrowserWindow): void {
   parentWin = parent;
   if (!win) return;
 
-  if (!parentOnCloseHandler) {
-    parentOnCloseHandler = () => {
-      allowClosing = true;
-      win.close();
-    };
-  }
-
-  win.getParentWindow()?.off('close', parentOnCloseHandler);
+  win.getParentWindow()?.off('close', closeWindowForReal);
   win.setParentWindow(parent);
-  parent?.on('close', parentOnCloseHandler);
-  allowClosing = parent === undefined;
+  parent?.on('close', closeWindowForReal);
 }
 
-export function getUiWindow(parent?: BrowserWindow): Promise<BrowserWindow> {
+export function getUiWindow({
+  closeIfLastWindow,
+  parent,
+}: Pick<
+  IpcLoggerOptions,
+  'closeIfLastWindow' | 'parent'
+>): Promise<BrowserWindow> {
   if (win) return Promise.resolve(win);
 
   return new Promise<BrowserWindow>((resolve, reject) => {
@@ -95,10 +94,34 @@ export function getUiWindow(parent?: BrowserWindow): Promise<BrowserWindow> {
         resolve(win);
       });
       win.on('close', (event) => {
-        if (allowClosing) return;
+        if (closeForReal) return;
         event.preventDefault();
         win.hide();
       });
+
+      if (closeIfLastWindow) {
+        /*
+         * Listener for when a `window` is closed, check if there's only one
+         * remaining and it's the IpcLogger UI window. If so, close it too.
+         */
+        const whenClosedCheckIfIsLastToCloseTheUi = (window: BrowserWindow) => {
+          if (window === win) return;
+          window.on('closed', () => {
+            const allWindows = BrowserWindow.getAllWindows();
+            if (allWindows.length !== 1 || allWindows[0] !== win) return;
+            closeWindowForReal();
+          });
+        };
+
+        // register the listener for every existing window
+        BrowserWindow.getAllWindows().forEach(
+          whenClosedCheckIfIsLastToCloseTheUi
+        );
+        // and every other window to be created after
+        app.on('browser-window-created', (ev, win) =>
+          whenClosedCheckIfIsLastToCloseTheUi(win)
+        );
+      }
 
       if (parent || parentWin) {
         setIpcLoggerParentWindow(parent || parentWin);
@@ -107,4 +130,9 @@ export function getUiWindow(parent?: BrowserWindow): Promise<BrowserWindow> {
       reject(e);
     }
   });
+}
+
+function closeWindowForReal(): void {
+  closeForReal = true;
+  win.close();
 }

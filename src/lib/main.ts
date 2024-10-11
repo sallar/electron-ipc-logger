@@ -100,7 +100,7 @@ export async function installIpcLogger(
   }
   isInstalled = true;
 
-  const uiWindow = await getUiWindow(options.parent);
+  const uiWindow = await getUiWindow(opt);
   const logEvent = getLogger(opt, uiWindow.webContents);
 
   hijackIpcMain(opt, logEvent);

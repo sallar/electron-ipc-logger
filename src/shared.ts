@@ -1,12 +1,7 @@
-import { BrowserWindow } from 'electron';
+import type { BrowserWindow } from 'electron';
 import type { IpcRenderer } from 'electron/renderer';
 
 export type IpcLoggerOptions = {
-  /**
-   * Usually the main window of the application.
-   * When the `parent` is closed, the IpcLogger will be closed too.
-   */
-  parent?: BrowserWindow;
   /**
    * When `true` the UI window will show as soon as it's ready.
    * If set to `false`, it can be opened at the convenient time by calling
@@ -15,6 +10,21 @@ export type IpcLoggerOptions = {
    * @default true
    */
   openUiOnStart?: boolean;
+  /**
+   * When another window is closed, if the IPC Logger is opened and it's the
+   * only remaining window, it will be automatically closed as well.
+   * This is usually the wanted behavior, but can be set to `false` to check
+   * data before the application exits.
+   *
+   * @default true
+   */
+  closeIfLastWindow?: boolean;
+  /**
+   * Usually the main window of the application.
+   * When the `parent` is closed, the IpcLogger will be closed too.
+   * It also makes the IpcLogger window stays on top of the parent all the time.
+   */
+  parent?: BrowserWindow;
   /**
    * Option to quickly enable or disable logging without overriding other options.
    * `true` to enable logging, `false` to disable it.
@@ -93,8 +103,11 @@ export type IpcLoggerMsgUpdateResult = { result: any; n: number };
 export const API_NAMESPACE = '__ELECTRON_IPC_LOGGER__';
 export const IPC_CHANNEL = '__ELECTRON_IPC_LOGGER__';
 
-export const DEFAULT_OPTIONS: IpcLoggerOptions = {
+export const DEFAULT_OPTIONS: Required<
+  Omit<IpcLoggerOptions, 'parent' | 'filter' | 'onIpcMessage'>
+> = {
   openUiOnStart: true,
+  closeIfLastWindow: true,
   disable: false,
   mainToRenderer: true,
   rendererToMain: true,

@@ -2,7 +2,9 @@
 
 Log and display all user-defined IPC traffic in an electron app.
 
-![v1.0.0-rc1](./screenshots/v1.0.0-rc1.png)
+![v1.1.0](./screenshots/v1.1.0.png)
+
+[See the version change log](./CHANGELOG.md).
 
 ## Configuring it
 
@@ -132,7 +134,7 @@ app.whenReady().then(async () => {
 });
 ```
 
-By default the IPC Logger UI window can be opened anytime using `Control + Shift + D` (`Command + Shift + D` on Mac). The shortcut can be customized or disabled.
+By default the IPC Logger UI window can be opened anytime using `Control + Shift + D` (`⌘ + Shift + D` on Mac). The shortcut can be customized or disabled.
 
 #### ② Menu
 
@@ -218,11 +220,11 @@ That was actually the initial approach for this module: Providing an extra `IPC`
 
 ## How does internally works?
 
-A.K.A. Helping myself to remember the underlying architecture (or explaining the insides to collaborators).
+a.k.a. helping [myself](https://github.com/danikaze) remembering the underlying architecture (or explaining the insides to collaborators).
 
 First thing required is to call `installIpcLogger()` from the **main** process.
 
-This will create a UI browser window for the IpcLogger to display the data. Yes, this is always done whether shown or not. This is a package for debugging IPC messages so, don't forget to disable it on production (by not calling `installIpcLogger` or by passing the `disabled: true` option).
+This will create a UI browser window for the IpcLogger to display the data. Yes, this is always done whether the UI window is shown or not. This is a package for debugging IPC messages so, don't forget to disable it on production (by not calling `installIpcLogger` or by passing the `disabled: true` option).
 
 Once a reference to the window is available, all the relevant IPC methods in `ipcMain` will be _hijacked_, allowing the capture of incoming and outcoming messages, but this alone will not be able capture messages sent when _replying_ incoming events (as it's not done through the `ipcMain` object, but using the `WebContents` of the sender directly).
 
@@ -231,5 +233,7 @@ For that, `BrowserWindow.WebContents` need to be hijacked as well, which is done
 The UI window is initialized with the [preload](src/ui/preload.ts) script which exposes some data and the `IpcRenderer`, which will be used to send/receive the captured IPC messages.
 
 IPC messages are captured always in the main process and sent to the UI window using IPCs as well. The installed preload script will store them and make them available for the UI.
+
+To optimize sending messages with log updates to the UI Window, it keeps track of what was the last message sent, and only sends newer ones. However, internally every log is preserved on memory so method called with `.invoke` can be updated. Updated methods are always sent regardless if the original message (without the returned value) was already sent or not.
 
 The UI window loads [an empty page](src/ui/index.html) that executes [index.tsx](src/ui/index.tsx) rendering the UI itself via React. This UI registers a listener to _react_ when new data is received from the main process, and from here is just displaying the data as any usual web-app.

@@ -1,5 +1,5 @@
+import type { ElectronAPI } from '@electron-toolkit/preload';
 import type { BrowserWindow } from 'electron';
-import type { IpcRenderer } from 'electron/renderer';
 
 export type IpcLoggerOptions = {
   /**
@@ -76,6 +76,10 @@ export type IpcLoggerOptions = {
    */
   logSize?: number;
   /**
+   * When `true`, it will open the DevTools and enable the dev keyboard shortcuts
+   */
+  debug?: boolean;
+  /**
    * IPC channel to apply the filter to.
    * This is a more advanced alternative to `logSystemMessages`.
    * Note that unless `logSystemMessages` is set to `true`, the `filter` won't
@@ -118,7 +122,7 @@ export type IpcLoggerApi = Readonly<{
   /** Start time, to calculate relative times */
   startTime: number;
   /** electron ipcRenderer accessor */
-  ipcRenderer: IpcRenderer;
+  ipcRenderer: ElectronAPI['ipcRenderer'];
   /** When running on mac (to know what key mod is needed: `meta` or `ctrl`) */
   isMac: boolean;
   /** Allows registering listeners called when new IPC data is caught */
@@ -152,6 +156,7 @@ export const DEFAULT_OPTIONS: Required<
   consoleOutput: false,
   logSystemMessages: false,
   logSize: 1000,
+  debug: false,
   shortcut: 'CmdOrCtrl+Shift+D',
 };
 

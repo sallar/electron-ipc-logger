@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import { CSSProperties, FC } from 'react';
 
-import { IpcLoggerApi, IpcLoggerUiOptions } from '../../shared';
+import { IpcLoggerApi } from '../../shared';
 import { DataPanel } from '../data-panel';
 import { IpcTable } from '../table';
 import { TopBar } from '../top-bar';
@@ -11,7 +11,6 @@ import styles from './renderer.module.scss';
 
 export type Props = {
   api: IpcLoggerApi;
-  options: IpcLoggerUiOptions;
 };
 
 /**
@@ -31,6 +30,7 @@ export const Renderer: FC<Props> = (props) => {
     displayRelativeTimes,
     sortBy,
     sortReverse,
+    logSizeReached,
     onDragStart,
     onDrag,
     onMainScroll,
@@ -81,6 +81,7 @@ export const Renderer: FC<Props> = (props) => {
           relativeTimes={displayRelativeTimes}
           sortBy={sortBy}
           sortReverse={sortReverse}
+          logSizeReached={logSizeReached}
           setSortBy={setSortCriteria}
           onRowClick={setSelectedIpcMsg}
         />

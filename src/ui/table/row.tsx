@@ -1,6 +1,7 @@
 import { clsx } from 'clsx';
 import { forwardRef, MouseEvent, useCallback } from 'react';
 import { IpcLogData } from '../../shared';
+import { safeJsonStringify } from '../json/safe-json';
 import { Time } from '../time';
 import { TrafficArrow } from '../traffic-arrow';
 
@@ -45,7 +46,7 @@ export const IpcRow = forwardRef<HTMLTableRowElement, Props>(
           {data.method}
         </td>
         <td className={styles.colChannel}>{data.channel}</td>
-        <td className={styles.colArgs}>{JSON.stringify(data.args)}</td>
+        <td className={styles.colArgs}>{safeJsonStringify(data.args)}</td>
       </tr>
     );
   }

@@ -1,5 +1,13 @@
 # electron-ipc-logger change log
 
+## 1.2.0
+
+- Added `options.logSize`
+- Added `options.debug`
+- The data panel maintains the selected message if any, even if new data comes from the main process.
+- Avoid errors when the data to display is a malformed JSON or has circular references.
+- The data panel displays circular references with an icon (`⭯`).
+
 ## 1.1.0
 
 - **Clear messages**: Add a button to clear the logs in the UI Window (`Ctrl + L` / `⌘ + L`) also works when the UI Window is focused

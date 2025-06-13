@@ -41,6 +41,8 @@ Complete list of options accepted by `installIpcLogger`:
 | `shortcut`          | `string` \| `boolean`                       | `'CmdOrCtrl+Shift+D'` | [Accelerator](https://www.electronjs.org/docs/latest/api/accelerator) (key shortcut) to register globally to open the IPC Logger UI window. Can be set to `false` or empty string `''` to disable it (`true` will just keep the default shortcut)  |
 | `filter`            | `(data: IpcLogData) => boolean`             | `undefined`           | Allows specifying what IPC messages should be logged or not. Note that unless `logSystemMessages` is set to `true`, the `filter` won't receive data from IPC channels considered as system messages.                                               |
 | `onIpcMessage`      | `(channel: string, ...data: any[]) => void` | `undefined`           | Callback to handle the intercepted messages with custom code (i.e. log it to a file, etc.)                                                                                                                                                         |
+| `debug`             | `boolean`                                   | `false`               | (since `v1.2.0`) When `true`, the DevTools will open for the UI Window, and [development shortcuts](https://github.com/sindresorhus/electron-debug) will be enabled.                                                                               |
+| `logSize`           | `number`                                    | `1000`                | (since `v1.2.0`) Maximum number of messages to show in the UI Window (for performance reasons). Set to `0` to disable.                                                                                                                             |
 
 ## F.A.Q
 

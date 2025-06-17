@@ -1,5 +1,10 @@
 # electron-ipc-logger change log
 
+## 1.2.1
+
+- Fixed ESM + CJS script conflicts introduced with the usage of `electron-debug`
+- Added CSP (Content Security Policy) to avoid the visible warning on the UI devtools console when `debug` is given
+
 ## 1.2.0
 
 - Added `options.logSize`

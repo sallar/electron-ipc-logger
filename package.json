@@ -1,6 +1,6 @@
 {
   "name": "electron-ipc-logger",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Log and display all user-defined IPC traffic in an electron app.",
   "type": "module",
   "main": "dist/index.js",

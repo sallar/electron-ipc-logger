@@ -1,5 +1,5 @@
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 
 export function getAbsolutePath(...path: string[]): string {
-  return resolve('node_modules', 'electron-ipc-logger', ...path);
+  return resolve(join(__dirname, 'electron-ipc-logger'), ...path);
 }
